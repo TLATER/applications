@@ -1,0 +1,157 @@
+app-id: com.blizzard.Hearthstone
+branch: stable
+
+runtime: org.winepak.Platform
+runtime-version: 3.0
+sdk: org.winepak.Sdk
+
+base: com.blizzard.BattleNet.BaseApp
+base-version: stable
+
+command: hearthstone
+
+inherit-extensions:
+  - org.winepak.Platform.Compat32
+  - org.winepak.Platform.Extension.corefonts
+  - org.winepak.Platform.Extension.vcrun2015
+
+add-extensions:
+  org.winepak.Platform.Extension.d3dx9:
+    directory: lib/extension/d3dx9
+    version: 3.0
+    no-autodownload: false
+
+  org.winepak.Platform.Wine:
+    directory: lib/wine
+    version: 3.9-staging
+    add-ld-path: lib
+    no-autodownload: false
+
+  org.winepak.Platform.Wine.Compat32:
+    directory: lib/wine-32bit
+    version: 3.9-staging
+    add-ld-path: lib
+    no-autodownload: false
+
+tags:
+  - proprietary
+
+finish-args:
+  - --socket=x11
+  - --socket=pulseaudio
+  - --share=ipc
+  - --share=network
+  - --device=dri
+  - --allow=multiarch
+  - --allow=devel
+
+modules:
+  - name: setup-wine
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/wine
+
+  - name: setup-wine-compat32
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/wine-32bit
+
+  - name: setup
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/extension/d3dx9
+
+  - name: hearthstone
+    only-arches:
+      - x86_64
+    buildsystem: simple
+    build-commands:
+      - install -d /app/bin
+      - install hearthstone-installer /app/bin
+      - install hearthstone /app/bin
+      - install -Dm644 com.blizzard.Hearthstone.appdata.xml /app/share/appdata/com.blizzard.Hearthstone.appdata.xml
+      - install -Dm644 com.blizzard.Hearthstone.svg /app/share/icons/hicolor/scalable/apps/com.blizzard.Hearthstone.svg
+      - install -Dm644 com.blizzard.Hearthstone.desktop /app/share/applications/com.blizzard.Hearthstone.desktop
+
+    sources:
+      - type: script
+        dest-filename: hearthstone-installer
+        commands:
+          - if [ -z "$WINEPREFIX" ]; then
+          - '    echo "No wine prefix set or is empty, abort."'
+          - '    exit 1'
+          - fi
+          -
+          - source /app/bin/battlenet-installer "battlenet://WTCG"
+          -
+          - if [[ $? != 0 ]] ; then
+          - '    echo "Battle.net installer failed, abort."'
+          - '    exit 1'
+          - fi
+          -
+          - if [ -e "${WINEPREFIX}/dosdevices/c:/Program Files (x86)/Hearthstone" ] ; then
+          - '    echo "This prefix already has an exisiting ''Hearthstone'' install at ${WINEPREFIX}"'
+          - '    echo "In order to install ''Hearthstone'' you must move or delete the current prefix."'
+          - '    exit 1'
+          - fi
+          -
+          - echo "Installing Extension(s)..."
+          -
+          - echo "Installer finished"
+          -
+          - echo "Performing tweak(s)..."
+          - echo "Clear Windows Version"
+          - wine64 reg delete 'HKLM\Software\Microsoft\Windows\CurrentVersion' /v SubVersionNumber /f
+          - wine64 reg delete 'HKLM\Software\Microsoft\Windows\CurrentVersion' /v VersionNumber /f
+          - wine64 reg delete 'HKLM\Software\Microsoft\Windows NT\CurrentVersion' /v CSDVersion /f
+          - wine64 reg delete 'HKLM\Software\Microsoft\Windows NT\CurrentVersion' /v CurrentBuildNumber /f
+          - wine64 reg delete 'HKLM\Software\Microsoft\Windows NT\CurrentVersion' /v CurrentVersion /f
+          - wine64 reg delete 'HKLM\System\CurrentControlSet\Control\ProductOptions' /v ProductType /f
+          - wine64 reg delete 'HKLM\System\CurrentControlSet\Control\ServiceCurrent' /v OS /f
+          - wine64 reg delete 'HKLM\System\CurrentControlSet\Control\Windows' /v CSDVersion /f
+          - wine64 reg delete 'HKCU\Software\Wine' /v Version /f
+          - wine64 reg delete 'HKLM\System\CurrentControlSet\Control\ProductOptions' /v ProductType /f
+          -
+          - echo "Set Windows Version to 10"
+          - wine64 reg add 'HKLM\System\CurrentControlSet\Control\ProductOptions' /v ProductType /d 'WinNT' /f
+          - wine64 reg add 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion' /v CSDVersion /d '' /f
+          - wine64 reg add 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion' /v CurrentBuildNumber /d '10240' /f
+          - wine64 reg add 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion' /v CurrentVersion /d '10.0' /f
+          - wine64 reg add 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Windows' /v CSDVersion /t REG_DWORD /d 00000000 /f
+          -
+          - echo "Set Hearthstone to run with directx9"
+          # FIXME: This is not very robust. If the batllenet project
+          #        ever decides to set "Games", or do anything other
+          #        than closing the json dict on the final line, this
+          #        will break horribly.
+          - 'sed -i ''$d'' "${WINEPREFIX}/dosdevices/c:/users/${USER}/Application Data/Battle.net/Battle.net.config"'
+          - 'echo '',"Games": { "hs_beta": { "AdditionalLaunchArguments": "-force-d3d9" } } }'' >> "${WINEPREFIX}/dosdevices/c:/users/${USER}/Application Data/Battle.net/Battle.net.config"'
+
+      - type: script
+        dest-filename: hearthstone
+        commands:
+          - export WINEARCH=win64
+          -
+          - if ! [ -e "${WINEPREFIX}/dosdevices/c:/Program Files (x86)/Battle.net" ] ; then
+          - '    source /app/bin/hearthstone-installer'
+          - '    if [[ $? != 0 ]] ; then'
+          - '        echo "Installation failed, abort."'
+          - '        exit 1'
+          - '    fi'
+          - fi
+          -
+          - echo "Verify \"Battle.net Helper.exe\" doesn't launch..."
+          - if [ -f "${WINEPREFIX}/dosdevices/c:/Program Files (x86)/Battle.net/Battle.net*/Battle.net Helper.exe" ] ; then
+          - '    mv "${WINEPREFIX}/dosdevices/c:/Program Files (x86)/Battle.net/Battle.net*/Battle.net Helper.exe" "${WINEPREFIX}/dosdevices/c:/Program Files (x86)/Battle.net/Battle.net*/Battle.net Helper.exe.bak"'
+          - fi
+          -
+          - wine64 "${WINEPREFIX}/dosdevices/c:/Program Files (x86)/Battle.net/Battle.net Launcher.exe" "battlenet://WTCG"
+
+      - type: file
+        path: com.blizzard.Hearthstone.appdata.xml
+
+      - type: file
+        path: com.blizzard.Hearthstone.svg
+
+      - type: file
+        path: com.blizzard.Hearthstone.desktop

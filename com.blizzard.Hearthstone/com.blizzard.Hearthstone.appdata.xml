@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+    <id>com.blizzard.Hearthstone.desktop</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>LicenseRef-proprietary</project_license>
+    <name>Hearthstone</name>
+    <summary>A fast-paced strategy card game</summary>
+    <description>
+        <p>Sheathe your sword, draw your deck, and get ready for Hearthstone - the fast-paced strategy card game that's easy to learn and massively fun. Start a free game and play your cards to sling spells, summon creatures, and command the heroes of Warcraft in duels of epic strategy.</p>
+    </description>
+    <screenshots>
+        <screenshot type="default">
+            <image width="980" height="590">https://d2vkoy1na2a6o6.cloudfront.net/images/media/screenshots/en-us/ss4-full-aeeaacb3830c9c68ae0bf10c5418d8b56c5b68195a94fcc276d64d4f16e0d05c34f6012234531b09564ffe98bdb72a0898d7369643766ae255ec52ddb8539874.jpg</image>
+        </screenshot>
+        <screenshot>
+            <image width="980" height="590">https://d2vkoy1na2a6o6.cloudfront.net/images/media/screenshots/en-us/ss5-full-7d4989a6037604c0ba10efb3029fa879a527c93f8ec07fa37e753dd6ec40712b71c96259225345d01de3453fc165d6d4bb398f201916dddebec74350e0970117.jpg</image>
+        </screenshot>
+        <screenshot>
+            <image width="980" height="590">https://d2vkoy1na2a6o6.cloudfront.net/images/media/screenshots/en-us/ss1-full-72f425379264f9def23c9445d81c7f55740121789ff98f083f2a0f5e9b1f75ccb20315c42cc7d9142d5745a5d67d5c89900d608d3ecca721eb5827a3f53688a7.jpg</image>
+        </screenshot>
+        <screenshot>
+            <image width="980" height="590">https://d2vkoy1na2a6o6.cloudfront.net/images/media/screenshots/en-us/ss2-full-244c09bab5752fb44972016c838ce4834e474685fc1e04860ddef035fe7ced61cc919cd5fad96e3b926e5ad7ae8775de091aa5fc283bf306ff36e66d4b757298.jpg</image>
+        </screenshot>
+        <screenshot>
+            <image width="980" height="590">https://d2vkoy1na2a6o6.cloudfront.net/images/media/screenshots/en-us/ss3-full-358d2b15e8a699c615ba1c9fae7dd78747c37035330c84284b40a6643731c138315e22e39770f1597f5413531d5ddf26ae8e5e9cec5c77a4d862304d68f6b917.jpg</image>
+        </screenshot>
+    </screenshots>
+    <project_group>winepak</project_group>
+    <developer_name>Blizzard Entertainment</developer_name>
+
+    <url type="homepage">https://playhearthstone.com</url>
+    <url type="help">https://us.battle.net/support/en/games/hearthstone</url>
+    <url type="bugtracker">https://us.battle.net/forums/en/hearthstone/10591462/</url>
+
+    <categories>
+        <category>Game</category>
+        <category>Strategy</category>
+    </categories>
+
+    <content_rating type="oars-1.1">
+        <content_attribute id="violence-fantasy">moderate</content_attribute>
+        <content_attribute id="violence-bloodshed">mild</content_attribute>
+        <content_attribute id="drugs-alcohol">mild</content_attribute>
+        <content_attribute id="sex-themes">mild</content_attribute>
+        <content_attribute id="sex-appearance">moderate</content_attribute>
+        <content_attribute id="social-chat">intense</content_attribute>
+        <content_attribute id="money-purchasing">intense</content_attribute>
+        <content_attribute id="money-gambling">mild</content_attribute>
+    </content_rating>
+
+    <releases>
+        <release date="2018-07-14" version="2018.07.14">
+            <description>
+                <ul>
+                    <li>Initial release of Hearthstone via winepak.</li>
+                </ul>
+            </description>
+        </release>
+    </releases>
+</component>
